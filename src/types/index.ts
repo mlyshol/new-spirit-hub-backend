@@ -8,6 +8,7 @@ export type Accent =
 
 export interface Item {
   title: string;
+  shortDescription: string;
   description: string;
   image?: string;
   href: string;

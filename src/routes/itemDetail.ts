@@ -1,16 +1,22 @@
 import { Router } from 'express';
-import Item from '../models/item.js'; // ✅ Import the actual model
+import Item from '../models/item.js';
 
 const router = Router();
 
 // GET /api/item-detail/:accent/:slug
 router.get('/:accent/:slug', async (req, res) => {
   try {
-    const { accent, slug } = req.params;
+    // Normalize to lowercase
+    const accent = req.params.accent.toLowerCase();
+    const slug = req.params.slug.toLowerCase();
     const href = `/${accent}/${slug}`;
 
-    // ✅ Only fetch published items
-    const item = await Item.findOne({ href, published: true });
+    // ✅ Only fetch published items, matching lowercase href
+    const item = await Item.findOne({
+      href: { $regex: new RegExp(`^${href}$`, 'i') }, // case-insensitive match
+      published: true
+    });
+
     if (!item) {
       return res.status(404).json({ error: 'Item not found' });
     }
